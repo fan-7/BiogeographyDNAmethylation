@@ -2,9 +2,9 @@
 ##2020713 multinom logistic regression 
 ## GAB972 Nna prov8  cov Null
 ## test leave one out 
-#nohup /LiuFanBin/R-3.6.1 < /thinker/storage/org/liufanGroup/fanxiu/geography/GAB1000Methy/condition2/multilogis8pro/province8.CpG53.covNULL.leave1outAUC.R --no-save > /thinker/storage/org/liufanGroup/fanxiu/geography/GAB1000Methy/condition2/multilogis8pro/province8.CpG53.covNULL.leave1outAUC.R.log &
-.libPaths(c(.libPaths(), '/thinker/storage/org/liufanGroup/public_software/R/3.6.1')) 
-setwd("/thinker/storage/org/liufanGroup/fanxiu/geography/GAB1000Methy/condition2/multilogis8pro")
+#nohup /LiuFanBin/R-3.6.1 <  //geography/GAB1000Methy/condition2/multilogis8pro/province8.CpG53.covNULL.leave1outAUC.R --no-save >  //geography/GAB1000Methy/condition2/multilogis8pro/province8.CpG53.covNULL.leave1outAUC.R.log &
+.libPaths(c(.libPaths(), ' /public_software/R/3.6.1')) 
+setwd(" //geography/GAB1000Methy/condition2/multilogis8pro")
 library(dplyr)
 library("nnet")
 library(pROC)
