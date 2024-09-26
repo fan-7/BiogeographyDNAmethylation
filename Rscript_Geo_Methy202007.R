@@ -1,28 +1,28 @@
 ## 20191119
-## GAB1000 MEthylation geography inference
+## 1000 MEthylation geography inference
 ## extract sample1000 snp(hwp0.001 exclude) to get PC5 
-plink --bfile /ancestry/GAB_1000G/2509GAB1000G/GAB2509Merge1000G/GAB2509.exHWP --keep /geography/GAB1000Methy/GAB1000genome/GABmale990.samplelist.txt --make-bed --out /geography/GAB1000Methy/GAB1000genome/GABmale990Methy.genome
-plink --bfile /geography/GAB1000Methy/GAB1000genome/GAB1000Methy.genome --pca 5 --out /geography/GAB1000Methy/GAB1000genome/pc5.GAB1000genome
+plink --bfile /ancestry/_1000G/25091000G/2509Merge1000G/2509.exHWP --keep /geography/1000Methy/1000genome/male990.samplelist.txt --make-bed --out /geography/1000Methy/1000genome/male990Methy.genome
+plink --bfile /geography/1000Methy/1000genome/1000Methy.genome --pca 5 --out /geography/1000Methy/1000genome/pc5.1000genome
  
 
-plink --bfile /geography/GAB1000Methy/GAB1000genome/GABmale990Methy.genome --pca 10 --out /geography/GAB1000Methy/GAB1000genome/pc.GABmalegenome
+plink --bfile /geography/1000Methy/1000genome/male990Methy.genome --pca 10 --out /geography/1000Methy/1000genome/pc.malegenome
 
-cd /geography/GAB1000Methy/conditionalEWAS 
+cd /geography/1000Methy/conditionalEWAS 
 ##20191128 manage data for logit
 R
-setwd("//geography/GAB1000Methy/conditionalEWAS")
-male990 <- read.table("GABmale990Methy.txt", header = TRUE)
-pc10 <- read.table("//geography/GAB1000Methy/GAB1000genome/pc10.GABmalegenome.eigenvec", header = FALSE)
+setwd("//geography/1000Methy/conditionalEWAS")
+male990 <- read.table("male990Methy.txt", header = TRUE)
+pc10 <- read.table("//geography/1000Methy/1000genome/pc10.malegenome.eigenvec", header = FALSE)
 names(pc10) <- c("FID", "IID", "PC1", "PC2","PC3","PC4","PC5","PC6","PC7","PC8","PC9","PC10")
 dataGeo <- merge(male990, pc10[,-1], by = "IID")
 library(dplyr)
 dataGeo <- select(dataGeo, FID, everything())
-write.table(na.omit(dataGeo), file = "dataGeo.GAB922", quote = FALSE, row.names = FALSE)
+write.table(na.omit(dataGeo), file = "dataGeo.922", quote = FALSE, row.names = FALSE)
 dataGeo <- na.omit(dataGeo)
 save(dataGeo, file = "dataGeo.RData")
 ## use preparer data to EWAS
 #
-setwd("//geography/GAB1000Methy/conditionalEWAS")
+setwd("//geography/1000Methy/conditionalEWAS")
 load("dataGeo.RData")
 load("dataMethy.RData")
 gc()
@@ -124,7 +124,7 @@ dev.off()
 ## 20191128 try to pca plot for 8 province with Methylation
 
 ##20200323try EWAS y1-1　
-setwd("//geography/GAB1000Methy/conditionalEWAS")
+setwd("//geography/1000Methy/conditionalEWAS")
 load("dataGeo.RData")
 load("dataMethy.RData")
 gc()
@@ -180,7 +180,7 @@ return(blogitRe)
 y1_dataMethy_bligitResult_2 <- apply(dataMethy, 1, blogit)
 write.table(y1_dataMethy_bligitResult_2, file = "y1_dataMethy_bligit.Result_2", quote = F, row.names = F)
 library(data.table)
-y1_dataMethy_bligitResult_2 <- fread("//geography/GAB1000Methy/conditionalEWAS/y1_dataMethy_bligit.Result_2", header = TRUE)
+y1_dataMethy_bligitResult_2 <- fread("//geography/1000Methy/conditionalEWAS/y1_dataMethy_bligit.Result_2", header = TRUE)
 which.min(y1_dataMethy_bligitResult_2[4,])
 ##!!!!find min(result2)= min(result1) cg16329197
 ## try 2 y1~x+age+conCPG1
@@ -266,7 +266,7 @@ png("y1_dataMethy_bligit_age.Result_2.manhattan.png")
 manhattan(usedManhattanplot, col = c("blue4", "red3"), cex = 0.6, cex.axis = 0.9, ymax = 12, main = "manhattanplot．y1_dataMethy_2")
 dev.off()
 ## 20200324 rearrange data geo male 990
-data990 <- read.table("//geography/GAB1000Methy/conditionalEWAS/GABmale990Methy.txt", header = TRUE)
+data990 <- read.table("//geography/1000Methy/conditionalEWAS/male990Methy.txt", header = TRUE)
 dataProvin <- na.omit(data990)
 dataProvin$y1 <- dataProvin$y1-1
 dataProvin$y1 <- factor(dataProvin$y1-1)
@@ -284,15 +284,15 @@ dataCpG <- usedMethy[,which(colnames(usedMethy) %in% dataProvin$IID)] #723730   
 save(dataCpG, file = "dataCpG.RData")	
 
 ##20200329
-#nohup /Bin/R-3.6.1 < /ancestry/GAB_1000G/2509GAB1000G/ConditionalGWAS.Merge/LRLogis111SNP/leave1out.LR.R --no-save > /ancestry/GAB_1000G/2509GAB1000G/ConditionalGWAS.Merge/LRLogis111SNP/leave1out.LR.R.log &
+#nohup /Bin/R-3.6.1 < /ancestry/_1000G/25091000G/ConditionalGWAS.Merge/LRLogis111SNP/leave1out.LR.R --no-save > /ancestry/_1000G/25091000G/ConditionalGWAS.Merge/LRLogis111SNP/leave1out.LR.R.log &
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1')) 
 library(qqman)
 ######################################################################################
 ##20200409
 ##try predict province by languaugeFamily 111SNP
-cd /geography/GAB1000Methy/111SNPtoProvince
+cd /geography/1000Methy/111SNPtoProvince
 R
-prov8 <- read.table("//geography/GAB1000Methy/111SNPtoProvince/province8.GAB2509.1000G400.snp111.txt", header = TRUE)
+prov8 <- read.table("//geography/1000Methy/111SNPtoProvince/province8.2509.1000G400.snp111.txt", header = TRUE)
 prov8$y <- factor(prov8$y)
 save(prov8, file = "prov8.RData")
 usedPro <- prov8[,-c(1:4)]
@@ -334,7 +334,7 @@ for (k in 1:12){
           } 
 		  auc
 ##20200410 leaave one out precict by snp111
-cd /geography/GAB1000Methy/111SNPtoProvince
+cd /geography/1000Methy/111SNPtoProvince
 R
 load("prov8.RData")
 prov8$y1 <- ifelse(prov8$y==1,2,1) 
@@ -354,14 +354,14 @@ prov8 <- select(prov8, IID, sex, population, place, y, y1, y2, y3, y4, y5, y6, y
 save(prov8, file = "prov8.RData")
 ##leave1out
 ##20200410 multinom logistic regression ( !!!!!!!!!!!!!Add  MaxNWts = 2000 )
-## GAB2509+1000G400 prov8+4  snp111
-#nohup /Bin/R-3.6.1 < /ancestry/GAB_1000G/2509GAB1000G/ConditionalGWAS.Merge/leave1outAUC/auc.maxit1000.GAB_1000G.R --no-save > /ancestry/GAB_1000G/2509GAB1000G/ConditionalGWAS.Merge/leave1outAUC/auc.maxit1000.GAB_1000G.R.log &
+## 2509+1000G400 prov8+4  snp111
+#nohup /Bin/R-3.6.1 < /ancestry/_1000G/25091000G/ConditionalGWAS.Merge/leave1outAUC/auc.maxit1000._1000G.R --no-save > /ancestry/_1000G/25091000G/ConditionalGWAS.Merge/leave1outAUC/auc.maxit1000._1000G.R.log &
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1')) 
-setwd("//geography/GAB1000Methy/111SNPtoProvince")
+setwd("//geography/1000Methy/111SNPtoProvince")
 library(dplyr)
 library("nnet")
 library(pROC)
-load("//geography/GAB1000Methy/111SNPtoProvince/prov8.RData")
+load("//geography/1000Methy/111SNPtoProvince/prov8.RData")
 fitdata <- na.omit(prov8[,-c(1:4)])
 snpname <- colnames(fitdata)[14:ncol(fitdata)]
 yname <- as.character(paste("y", c(1:12), sep = ""))
@@ -401,17 +401,17 @@ auc
 ## MeQTL predict province
 cd /liuxx/MeQTL/whole_analyse_result
 head /liuxx/MeQTL/whole_analyse_result/cisSigRlt
-head /geography/GAB1000Methy/111SNPtoProvince/select111SNP.list
-cd /geography/GAB1000Methy/111SNPtoProvince
-awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/GAB1000Methy/111SNPtoProvince/select111SNP.list /liuxx/MeQTL/whole_analyse_result/cisSigRlt > cismatch.snp111.cpg
-awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/GAB1000Methy/111SNPtoProvince/select111SNP.list /liuxx/MeQTL/whole_analyse_result/transSigRlt > transmatch.snp111.cpg
+head /geography/1000Methy/111SNPtoProvince/select111SNP.list
+cd /geography/1000Methy/111SNPtoProvince
+awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/1000Methy/111SNPtoProvince/select111SNP.list /liuxx/MeQTL/whole_analyse_result/cisSigRlt > cismatch.snp111.cpg
+awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/1000Methy/111SNPtoProvince/select111SNP.list /liuxx/MeQTL/whole_analyse_result/transSigRlt > transmatch.snp111.cpg
 ## after select Cpg 360
 ## predict8 province 
 R 
-load("//geography/GAB1000Methy/conditionalEWAS/dataCpG.RData")
-load("//geography/GAB1000Methy/conditionalEWAS/dataProvin.RData")
+load("//geography/1000Methy/conditionalEWAS/dataCpG.RData")
+load("//geography/1000Methy/conditionalEWAS/dataProvin.RData")
 dim(dataCpG)  ## 723730    972
-cpg360 <- read.table("//geography/GAB1000Methy/111SNPtoProvince/CpG360.list", header = TRUE)
+cpg360 <- read.table("//geography/1000Methy/111SNPtoProvince/CpG360.list", header = TRUE)
 dim(cpg360)  ## 360   1
 cpg360 <- cpg360$DNAm
 selectCpG <- dataCpG[rownames(dataCpG) %in% cpg360,]
@@ -421,11 +421,11 @@ selectCpG <- data.frame(IID,t(selectCpG))
 dim(selectCpG)  ##972 361
 prov8.CpG360 <- merge(dataProvin, selectCpG, by = "IID")
 dim(prov8.CpG360)  ##972 374
-write.table(prov8.CpG360, file = "prov8.CpG360.GABNna972", quote = FALSE, row.names = FALSE)
+write.table(prov8.CpG360, file = "prov8.CpG360.Nna972", quote = FALSE, row.names = FALSE)
 save(prov8.CpG360, file = "prov8.CpG360.RData")
 ## try multilogis
-setwd("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
-load("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis/prov8.CpG360.RData")
+setwd("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
+load("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis/prov8.CpG360.RData")
 data <- prov8.CpG360[,-c(1:5)]
 cpgname <- colnames(data)[10:ncol(data)]
      fo <- as.formula(paste("province ~ ", paste(cpgname[1:length(cpgname)], collapse = "+")))
@@ -441,13 +441,13 @@ for (k in 1:8){
           auc[k] <- roc_result$auc
           } 
 auc
-## cpg360 predict prov 8 all correct GAB972
+## cpg360 predict prov 8 all correct 972
 ## test leave one out 
-setwd("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
+setwd("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
 library(dplyr)
 library("nnet")
 library(pROC)
-load("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis/prov8.CpG360.RData")
+load("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis/prov8.CpG360.RData")
 fitdata <- na.omit(prov8.CpG360[,-c(1:5)])
 cpgname <- colnames(fitdata)[10:ncol(fitdata)]
 yname <- as.character(paste("y", c(1:8), sep = ""))
@@ -475,7 +475,7 @@ pre <- c(NA)
 write.table(auc, file = "AUC.MaxNWts3000.leave1out.prov8.cpg360", row.name = F, quote = F)
 
 ##20200411 ## manage leave one out CpG360 performance
-setwd("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
+setwd("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
 pro <- read.table("MaxNWts3000.cpg360.pro", header = TRUE)
 pre <- read.table("MaxNWts3000.cpg360.pre", header = TRUE)
 per_logis1 <-  confusionMatrix(factor(pro$x),factor(fitdata$province))
@@ -485,8 +485,8 @@ pre <- as.matrix(pre)
 ##20200411
 ## try mean(auc) 8 -2 select CpG360
 # cpg360  in
-setwd("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
-load("//geography/GAB1000Methy/111SNPtoProvince/pro8.cpg360.multilogis/prov8.CpG360.RData") 
+setwd("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis")
+load("//geography/1000Methy/111SNPtoProvince/pro8.cpg360.multilogis/prov8.CpG360.RData") 
 fitdata <- na.omit(prov8.CpG360[,-c(1:5)])
 cpgname <- colnames(fitdata)[10:ncol(fitdata)]
 meanAUC <- c()
@@ -562,14 +562,14 @@ a <- apply(corcpg,2,which.max)
 ## data prepare 
 /Bin/R-3.6.1
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1')) 
-setwd("//geography/GAB1000Methy/condition2/y1XinJiang")
-data <- read.csv("//geography/GAB1000Methy/condition2/GABMethydata.csv", header = T)
+setwd("//geography/1000Methy/condition2/y1")
+data <- read.csv("//geography/1000Methy/condition2/Methydata.csv", header = T)
 dim(data) # 990*13
 id <- gsub("-", "_", data$Me.id)
 data$Me.id <- id
-write.csv(data, file = "GABmale985Methy.csv", quote = F, row.names = F)
-datapro <- read.csv("//geography/GAB1000Methy/condition2/GABmale985Methy.csv", header = TRUE)
-datacov <- read.csv("//geography/GAB1000Methy/condition2/defcov.csv", header = TRUE)
+write.csv(data, file = "male985Methy.csv", quote = F, row.names = F)
+datapro <- read.csv("//geography/1000Methy/condition2/male985Methy.csv", header = TRUE)
+datacov <- read.csv("//geography/1000Methy/condition2/defcov.csv", header = TRUE)
 dataphe <- merge(datapro, datacov, by = "Me.id")
 dataphe$y1 <- factor(dataphe$y1-1)
 dataphe$y2 <- factor(dataphe$y2-1)
@@ -579,7 +579,7 @@ dataphe$y5 <- factor(dataphe$y5-1)
 dataphe$y6 <- factor(dataphe$y6-1)
 dataphe$y7 <- factor(dataphe$y7-1)
 dataphe$y8 <- factor(dataphe$y8-1)
-write.csv(dataphe, file = "usedCon2.GABmale985Methy.csv", quote = F, row.names = F)
+write.csv(dataphe, file = "usedCon2.male985Methy.csv", quote = F, row.names = F)
 #ewasFun 
 	  ewasFun <- function(usenormbetadata = FALSE, phedata, selphe, covariates = c("B","NK","CD4T","CD8T","Mono","Neutro","Eosino","PC1","PC2","PC3","PC4","PC5"), type = "linear", isbetadependent = FALSE, savepath = ".", logitmaxit = 25, chunknum = 1, plotmq = TRUE)
 {
@@ -744,22 +744,22 @@ write.csv(dataphe, file = "usedCon2.GABmale985Methy.csv", quote = F, row.names =
     message("###\n", selphe, " EWAS (", type, ") results are saved in ", savepath, "\n\n######\n")
 }
 ##test y1_1
-ewasFun(usenormbetadata = TRUE, phedata = "//geography/GAB1000Methy/condition2/usedCon2.GABmale985Methy.csv", selphe = "y1", covariates = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age"), type = "logit", isbetadependent = FALSE, savepath = "//geography/GAB1000Methy/condition2/y1XinJiang/ewasFun_output", logitmaxit = 25, chunknum = 1, plotmq = TRUE)
+ewasFun(usenormbetadata = TRUE, phedata = "//geography/1000Methy/condition2/usedCon2.male985Methy.csv", selphe = "y1", covariates = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age"), type = "logit", isbetadependent = FALSE, savepath = "//geography/1000Methy/condition2/y1/ewasFun_output", logitmaxit = 25, chunknum = 1, plotmq = TRUE)
 ############################################################################################
 ##try to select
 /Bin/R-3.6.1
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1'))  
 library(data.table())
-workpath <- "//geography/GAB1000Methy/condition2/y1XinJiang/"
+workpath <- "//geography/1000Methy/condition2/y1/"
 setwd(workpath)
 # selectCpG <- NA
 yname = "y1"
 covnames = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age")
-resultname <- "province.GABmale.conditional.ewas1e-6.y1"
+resultname <- "province.male.conditional.ewas1e-6.y1"
 selectCPG <- matrix(NA, 20,8)
 for(i in 1: 20){
     if(i ==1){
-	    phedata <- "//geography/GAB1000Methy/condition2/usedCon2.GABmale985Methy.csv"
+	    phedata <- "//geography/1000Methy/condition2/usedCon2.male985Methy.csv"
         savepath <- paste0(workpath, "y1CellAgeresult_",i)
         ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = covnames, type = "logit", isbetadependent = FALSE, savepath = savepath, logitmaxit = 25, chunknum = 1, plotmq = TRUE)
         #filter P < 1e-6 save
@@ -829,7 +829,7 @@ for(i in 1: 20){
 	}
 	############################################################
 	##20200422 gm132-1 restart
-	#test neimeng y2
+	#test  y2
 	> warnings()
 Warning messages:
 1: glm.fit: fitted probabilities numerically 0 or 1 occurred
@@ -849,37 +849,37 @@ Vcells 3295242 25.2 1121722249 8558.1 1752665689 13371.8
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1'))  
 library(data.table())
 library(qqman)
-workpath <- "//geography/GAB1000Methy/condition2/y1XinJiang/"
+workpath <- "//geography/1000Methy/condition2/y1/"
 setwd(workpath)
 yname = "y1"
 covnames = c("PC1", "PC2", "PC3", "PC4", "PC5", "B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age")
-resultname <- "province.GABmale.conditionalPC.ewas1e-6.y1"
+resultname <- "province.male.conditionalPC.ewas1e-6.y1"
 #ewas fun 
 selectCPG <- matrix(NA, 20,4)
 i = 1
-	    phedata <- "//geography/GAB1000Methy/condition2/usedCon2.GABmale985Methy.csv"
+	    phedata <- "//geography/1000Methy/condition2/usedCon2.male985Methy.csv"
         savepath <- paste0(workpath, "y1PC5CellAgeresult_",i)
         ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = covnames, type = "logit", isbetadependent = FALSE, savepath = savepath, logitmaxit = 25, chunknum = 1, plotmq = TRUE)
         #filter P < 1e-6 save
 	    tmp <- paste0("awk -F, '$5<1e-6 {print $1,$7,$8,$5}' ",savepath, "/ewasresult_",yname,".csv"," > ",workpath,resultname,"_",i)
 		system(tmp)
 ## 0CPG 
-resultname <- "province.GABmale.conditionalPC.ewas5e-2.y1"
+resultname <- "province.male.conditionalPC.ewas5e-2.y1"
 tmp <- paste0("awk -F, '$5<0.05 {print $1,$7,$8,$5}' ",savepath, "/ewasresult_",yname,".csv"," > ",workpath,resultname,"_",i)
 		system(tmp)
 #cg07315521,0.999597095762812
 ######################################
-##select XinJiang top3 CPG
+##select  top3 CPG
 /Bin/R-3.6.1
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1'))  
 
-workpath <- "//geography/GAB1000Methy/condition2/y1XinJiang/"
+workpath <- "//geography/1000Methy/condition2/y1/"
 setwd(workpath)
 yname = "y1"
 covnames = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age","cg15146515","cg03334052")
-resultname <- "province.GABmale.conditional.ewas1e-6.y1"
+resultname <- "province.male.conditional.ewas1e-6.y1"
 i=3
-phedata <- "//geography/GAB1000Methy/condition2/y1XinJiang/province.GABmale.conditional.ewas1e-6.y1_2.phecondata_2"
+phedata <- "//geography/1000Methy/condition2/y1/province.male.conditional.ewas1e-6.y1_2.phecondata_2"
 savepath <- paste0(workpath, yname,"CellAgeresult_",i)
 ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = covnames, type = "logit", isbetadependent = FALSE, savepath = savepath, logitmaxit = 25, chunknum = 1, plotmq = TRUE)
 #filter P < 1e-6 save
@@ -891,36 +891,36 @@ tmp <- paste0("awk -F, '$5<1e-6 {print $1,$7,$8,$5}' ",savepath, "/ewasresult_",
 		dataManhattan[which(dataManhattan$CPG %in% covnames),c(1:4)] <- NA
 	    selectCPG[i,] <- as.matrix(dataManhattan[which(dataManhattan$P == min(na.omit(dataManhattan)$P)),c(1:4)])
 ######################################
-##select XinJiang top4 CPG
-workpath <- "//geography/GAB1000Methy/condition2/y1XinJiang/"
+##select  top4 CPG
+workpath <- "//geography/1000Methy/condition2/y1/"
 setwd(workpath)
 yname = "y1"
 covnames = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age","cg15146515","cg03334052", "cg08597808")
-resultname <- "province.GABmale.conditional.ewas1e-6.y1"
+resultname <- "province.male.conditional.ewas1e-6.y1"
 i=4
-phedata <- "//geography/GAB1000Methy/condition2/y1XinJiang/province.GABmale.conditional.ewas1e-6.y1_3.phecondata_3"
+phedata <- "//geography/1000Methy/condition2/y1/province.male.conditional.ewas1e-6.y1_3.phecondata_3"
 savepath <- paste0(workpath, yname,"CellAgeresult_",i)
 ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = covnames, type = "logit", isbetadependent = FALSE, savepath = savepath, logitmaxit = 25, chunknum = 1, plotmq = TRUE)
 #Warning messages:
 #1: glm.fit: fitted probabilities numerically 0 or 1 occurred
 #filter P < 1e-6 save
 ###################################
-###select XinJiang top5 CPG
+###select  top5 CPG
 covnames = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age","cg15146515","cg03334052", "cg08597808","cg00277334")
-resultname <- "province.GABmale.conditional.ewas1e-6.y1"
+resultname <- "province.male.conditional.ewas1e-6.y1"
 i=5
-phedata <- "//geography/GAB1000Methy/condition2/y1XinJiang/province.GABmale.conditional.ewas1e-6.y1_4.phecondata_4"
+phedata <- "//geography/1000Methy/condition2/y1/province.male.conditional.ewas1e-6.y1_4.phecondata_4"
 savepath <- paste0(workpath, yname,"CellAgeresult_",i)
 ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = covnames, type = "logit", isbetadependent = FALSE, savepath = savepath, logitmaxit = 25, chunknum = 1, plotmq = TRUE)
 #Warning messages:
 # 1: glm.fit: fitted probabilities numerically 0 or 1 occurred
 
 ####################################
-##select XinJiang top6 CPG
+##select  top6 CPG
 covnames = c("B", "NK", "CD4T", "CD8T", "Mono", "Neutro", "Eosino", "age","cg15146515","cg03334052", "cg08597808","cg00277334","cg24869232")
-resultname <- "province.GABmale.conditional.ewas1e-6.y1"
+resultname <- "province.male.conditional.ewas1e-6.y1"
 i=6
-phedata <- "//geography/GAB1000Methy/condition2/y1XinJiang/province.GABmale.conditional.ewas1e-6.y1_5.phecondata_5"
+phedata <- "//geography/1000Methy/condition2/y1/province.male.conditional.ewas1e-6.y1_5.phecondata_5"
 savepath <- paste0(workpath, yname,"CellAgeresult_",i)
 ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = covnames, type = "logit", isbetadependent = FALSE, savepath = savepath, logitmaxit = 25, chunknum = 1, plotmq = TRUE)
 # Warning messages:
@@ -930,15 +930,15 @@ ewasFun(usenormbetadata = TRUE, phedata = phedata, selphe = yname, covariates = 
 # system('free -m')
 ############################################################################################
 ####20200426## try to predict province by chosen CPGS(y1-3 over)
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
-phedata1 <- read.csv("//geography/GAB1000Methy/condition2/y1XinJiang/province.GABmale.conditional.ewas1e-6.y1_7.phecondata_7", header = TRUE)
-phedata2 <- read.csv("//geography/GAB1000Methy/condition2/y2NeiMeng/province.GABmale.conditional.ewas1e-6.y2_4.phecondata_4", header = TRUE)
-phedata3 <- read.csv("//geography/GAB1000Methy/condition2/y3ShanXi/province.GABmale.conditional.ewas1e-6.y3_6.phecondata_6", header = TRUE)
-phedata4 <- read.csv("//geography/GAB1000Methy/condition2/y4HeNan/province.GABmale.conditional.ewas1e-6.y4_2.phecondata_2", header = TRUE)
-phedata5 <- read.csv("//geography/GAB1000Methy/condition2/y5ShanDong/province.GABmale.conditional.ewas1e-6.y5_1.phecondata_1", header = TRUE)
-phedata6 <- read.csv("//geography/GAB1000Methy/condition2/y6JiangXi/province.GABmale.conditional.ewas1e-6.y6_1.phecondata_1", header = TRUE)
-phedata7 <- read.csv("//geography/GAB1000Methy/condition2/y7SiChuan/province.GABmale.conditional.ewas1e-6.y7_1.phecondata_1", header = TRUE)
-phedata8 <- read.csv("//geography/GAB1000Methy/condition2/y8GuangXi/province.GABmale.conditional.ewas1e-6.y8_1.phecondata_1", header = TRUE)
+setwd("//geography/1000Methy/condition2/multilogis8pro")
+phedata1 <- read.csv("//geography/1000Methy/condition2/y1/province.male.conditional.ewas1e-6.y1_7.phecondata_7", header = TRUE)
+phedata2 <- read.csv("//geography/1000Methy/condition2/y2/province.male.conditional.ewas1e-6.y2_4.phecondata_4", header = TRUE)
+phedata3 <- read.csv("//geography/1000Methy/condition2/y3ShanXi/province.male.conditional.ewas1e-6.y3_6.phecondata_6", header = TRUE)
+phedata4 <- read.csv("//geography/1000Methy/condition2/y4HeNan/province.male.conditional.ewas1e-6.y4_2.phecondata_2", header = TRUE)
+phedata5 <- read.csv("//geography/1000Methy/condition2/y5ShanDong/province.male.conditional.ewas1e-6.y5_1.phecondata_1", header = TRUE)
+phedata6 <- read.csv("//geography/1000Methy/condition2/y6JiangXi/province.male.conditional.ewas1e-6.y6_1.phecondata_1", header = TRUE)
+phedata7 <- read.csv("//geography/1000Methy/condition2/y7SiChuan/province.male.conditional.ewas1e-6.y7_1.phecondata_1", header = TRUE)
+phedata8 <- read.csv("//geography/1000Methy/condition2/y8GuangXi/province.male.conditional.ewas1e-6.y8_1.phecondata_1", header = TRUE)
 data12 <- merge(phedata1, phedata2[,-c(2:25)], by = "Me.id")
 data34 <- merge(phedata3[,-c(2:25)], phedata4[,-c(2:25)], by = "Me.id")
 data56 <- merge(phedata5[,-c(2:25)], phedata6[,-c(2:25)], by = "Me.id")
@@ -971,15 +971,15 @@ for (k in 1:8){
 auc
 ############################################
 ##20200507 predict 8 province 
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
-phedata1 <- read.csv("//geography/GAB1000Methy/condition2/y1XinJiang/province.GABmale.conditional.ewas1e-6.y1_7.phecondata_7", header = TRUE)
-phedata2 <- read.csv("//geography/GAB1000Methy/condition2/y2NeiMeng/province.GABmale.conditional.ewas1e-6.y2_4.phecondata_4", header = TRUE)
-phedata3 <- read.csv("//geography/GAB1000Methy/condition2/y3ShanXi/province.GABmale.conditional.ewas1e-6.y3_6.phecondata_6", header = TRUE)
-phedata4 <- read.csv("//geography/GAB1000Methy/condition2/y4HeNan/province.GABmale.conditional.ewas1e-6.y4_9.phecondata_9", header = TRUE)
-phedata5 <- read.csv("//geography/GAB1000Methy/condition2/y5ShanDong/province.GABmale.conditional.ewas1e-6.y5_6.phecondata_6", header = TRUE)
-phedata6 <- read.csv("//geography/GAB1000Methy/condition2/y6JiangXi/province.GABmale.conditional.ewas1e-6.y6_9.phecondata_9", header = TRUE)
-phedata7 <- read.csv("//geography/GAB1000Methy/condition2/y7SiChuan/province.GABmale.conditional.ewas1e-6.y7_9.phecondata_9", header = TRUE)
-phedata8 <- read.csv("//geography/GAB1000Methy/condition2/y8GuangXi/province.GABmale.conditional.ewas1e-6.y8_3.phecondata_3", header = TRUE)
+setwd("//geography/1000Methy/condition2/multilogis8pro")
+phedata1 <- read.csv("//geography/1000Methy/condition2/y1/province.male.conditional.ewas1e-6.y1_7.phecondata_7", header = TRUE)
+phedata2 <- read.csv("//geography/1000Methy/condition2/y2/province.male.conditional.ewas1e-6.y2_4.phecondata_4", header = TRUE)
+phedata3 <- read.csv("//geography/1000Methy/condition2/y3ShanXi/province.male.conditional.ewas1e-6.y3_6.phecondata_6", header = TRUE)
+phedata4 <- read.csv("//geography/1000Methy/condition2/y4HeNan/province.male.conditional.ewas1e-6.y4_9.phecondata_9", header = TRUE)
+phedata5 <- read.csv("//geography/1000Methy/condition2/y5ShanDong/province.male.conditional.ewas1e-6.y5_6.phecondata_6", header = TRUE)
+phedata6 <- read.csv("//geography/1000Methy/condition2/y6JiangXi/province.male.conditional.ewas1e-6.y6_9.phecondata_9", header = TRUE)
+phedata7 <- read.csv("//geography/1000Methy/condition2/y7SiChuan/province.male.conditional.ewas1e-6.y7_9.phecondata_9", header = TRUE)
+phedata8 <- read.csv("//geography/1000Methy/condition2/y8GuangXi/province.male.conditional.ewas1e-6.y8_3.phecondata_3", header = TRUE)
 data12 <- merge(phedata1, phedata2[,-c(2:25)], by = "Me.id")
 data34 <- merge(phedata3[,-c(2:25)], phedata4[,-c(2:25)], by = "Me.id")
 data56 <- merge(phedata5[,-c(2:25)], phedata6[,-c(2:25)], by = "Me.id")
@@ -1012,26 +1012,26 @@ auc
 #######################################################################################################
 ####20200510 select CpG annovar
 ###table_annovar.pl example/ex1.avinput humandb -buildver hg19 -out myanno -remove -protocol refGene,cytoBand,exac03,avsnp147,dbnsfp30a -operation gx,r,f,f,f -nastring . -csvout -polish -xref example/gene_xref.txt
-filepath=//geography/GAB1000Methy/condition2/test/y1CpGtoAnnova.txt
+filepath=//geography/1000Methy/condition2/test/y1CpGtoAnnova.txt
 table_annovar=/liyi/software/annovar/table_annovar.pl
 humandb=/liyi/software/annovar/humandb/
 generef=/liyi/software/annovar/example/gene_fullxref.txt
 cd /liyi/software/annovar
-outname=//ancestry/GAB_1000G/Zang50HJD1000G/SNP.HJDZang.anno/ZangHJD2SNP_to_anno
+outname=//ancestry/_1000G/Zang50HJD1000G/SNP.HJDZang.anno/ZangHJD2SNP_to_anno
 perl $table_annovar  $filepath $humandb --outfile $outname --remove --buildver hg19 --protocol refGene,cytoBand,1000g2014oct_eur,1000g2014oct_afr,exac03,ljb26_all,clinvar_20140929,snp138 --operation gx,r,f,f,f,f,f,f --nastring . --csvout --polish  --xref $generef
 ## annovar fail because of no allele
 ##0511 used NCBI genome data viewer top cpg  gene
 ##try box/scatter plot 
 ## box-dotplot 散点和箱式图的合体
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
+setwd("//geography/1000Methy/condition2/multilogis8pro")
 phecondata <- read.csv("phecon53data1-8.csv", header  =TRUE)
 fitdata <- na.omit(phecondata)
-y <- factor(ifelse(fitdata$y1==0,"ctrl","XinJiang"))
+y <- factor(ifelse(fitdata$y1==0,"ctrl",""))
 x <- fitdata$cg15146515
 boxplot(x ~ y, border=4, col="light blue", boxwex=0.5, main = "cg15146515")
 points(x ~ y,col=2,cex=0.5, pch=16)
 dev.off()
-y <- factor(ifelse(fitdata$y2==0,"ctrl","NeiMeng"))
+y <- factor(ifelse(fitdata$y2==0,"ctrl",""))
 x <- fitdata$cg01083584
 boxplot(x ~ y, border=4, col="light blue", boxwex=0.5, main = "cg01083584")
 points(x ~ y,col=2,cex=0.5, pch=16)
@@ -1068,22 +1068,22 @@ boxplot(x ~ y, border=4, col="light blue", boxwex=0.5, main = "cg13580380")
 points(x ~ y,col=2,cex=0.5, pch=16)
 dev.off()
 ##################################################################
-awk -F, '{print $1,$7,$8,$5}' /geography/GAB1000Methy/condition2/y8GuangXi/y8CellAgeresult_4/ewasresult_y8.csv > /geography/GAB1000Methy/condition2/conManhattanPlot/usedManhattan.ewasresult_y8.csv
+awk -F, '{print $1,$7,$8,$5}' /geography/1000Methy/condition2/y8GuangXi/y8CellAgeresult_4/ewasresult_y8.csv > /geography/1000Methy/condition2/conManhattanPlot/usedManhattan.ewasresult_y8.csv
 
 # /Bin/R-3.6.1 
-##GABmale CpG cell7 age
+##male CpG cell7 age
 ## province 8 conditional GWAS
 .libPaths(c(.libPaths(), '/public_software/R/3.6.1'))  
 library(qqman)
 library(data.table)
-outpath <- "//geography/GAB1000Methy/condition2/conManhattanPlot/"
+outpath <- "//geography/1000Methy/condition2/conManhattanPlot/"
 setwd(outpath)
 # read data
-resultName <- "province.GABmale.conditional.ewas1e-6.y8"
+resultName <- "province.male.conditional.ewas1e-6.y8"
 yname <- "GuangXi"
 dataManhattan <- fread("usedManhattan.ewasresult_y8.csv", header = TRUE)
 names(dataManhattan) <- c("CPG", "CHR", "BP", "P")
-conCpG <- read.table("y8.selectCpG.province.GABmale.conditional.ewas1e-6",header = TRUE)
+conCpG <- read.table("y8.selectCpG.province.male.conditional.ewas1e-6",header = TRUE)
 # Manhattan plot
 cpgnames <- conCpG$CPG
 dataManhattan[which(dataManhattan$CPG %in% cpgnames),c(1:4)] <- NA
@@ -1097,14 +1097,14 @@ abline(h=-log10(1e-6),col="red")
 dev.off()
 ####################################################################################
 ##0512 leave1outAUC/auc
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
+setwd("//geography/1000Methy/condition2/multilogis8pro")
 phecondata <- read.csv("phecon53data1-8.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 covnames <- names(phecondata[c(3, 14:20)])
 fitdata <- na.omit(phecondata)
 library(caret)
 
-pre <- read.table("//geography/GAB1000Methy/condition2/test/province8.cpg53cell7age.pre", header = TRUE)
+pre <- read.table("//geography/1000Methy/condition2/test/province8.cpg53cell7age.pre", header = TRUE)
 pre <- factor(pre$x)
 table(factor(fitdata$province), pre)
 per <- confusionMatrix(pre,factor(fitdata$province))
@@ -1119,7 +1119,7 @@ for (k in 1:8){
 auc
 ###########################################################################
 ##20200524 leave1out province8~age +cpg53    (no cell 7)
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
+setwd("//geography/1000Methy/condition2/multilogis8pro")
 phecondata <- read.csv("phecon53data1-8.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 # just cov age
@@ -1144,14 +1144,14 @@ for (k in 1:8){
           } 
 auc
 ##waiting for pre and pro dataleave1out
-pre <- read.table("//geography/GAB1000Methy/condition2/multilogis8pro/province8.cpg53age.pre", header = TRUE)
+pre <- read.table("//geography/1000Methy/condition2/multilogis8pro/province8.cpg53age.pre", header = TRUE)
 pre <- factor(pre$x)
 table(factor(fitdata$province), pre)
 per <- confusionMatrix(pre,factor(fitdata$province))
 # result no cell 7  = +cell7
 ###########################################################################
 ##20200525 leave1out province8~age +cpg53 + population(9)    (no cell 7)
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
+setwd("//geography/1000Methy/condition2/multilogis8pro")
 phecondata <- read.csv("phecon53data1-8.csv", header  =TRUE)
 # test y1 ~ cpg7 +age +population
 cpgnames <- names(phecondata[26:32])
@@ -1223,7 +1223,7 @@ summary(fit1)
 
 ###########################################################################
 ##20200525  plot pca plot by select 53cpg 
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
+setwd("//geography/1000Methy/condition2/multilogis8pro")
 phecondata <- read.csv("phecon53data1-8.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 covnames <- names(phecondata[c(3, 14:20)])
@@ -1248,17 +1248,17 @@ col <- colorRampPalette(c("red","orange", "yellow","forestgreen","grey","royalbl
 tiff("pc1.pc2.cpg53.province8.sample988.tiff", bg = "white", width = 3000, height = 2000, res = 240)
 plot(usedPC12[,1], usedPC12[,2], type="n", main="pca.CpG53", adj=0.5, xlab="PC1(13.0%)", ylab="PC2(10.5%)", font=2, font.lab=2)
 points(usedPC12[,1], usedPC12[,2], col=col, pch=20, cex=1.1)
-legend("bottomright", bty="n", cex=1.1, title="", c("XinJiang","NeiMeng", "ShanXi", "HeNan", "ShanDong", "JiangXi", "SiChuan", "GuangXi"), fill=c("red","orange", "yellow","forestgreen","grey","royalblue","purple","black"))
+legend("bottomright", bty="n", cex=1.1, title="", c("","", "ShanXi", "HeNan", "ShanDong", "JiangXi", "SiChuan", "GuangXi"), fill=c("red","orange", "yellow","forestgreen","grey","royalblue","purple","black"))
 dev.off()
 
 
 ## ## MeQTL(SNP ~select cpg53) predict province
 cd /liuxx/MeQTL/whole_analyse_result
 head /liuxx/MeQTL/whole_analyse_result/cisSigRlt
-head /geography/GAB1000Methy/111SNPtoProvince/select111SNP.list
-cd /geography/GAB1000Methy/condition2/meQTLs53CpG
-awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/GAB1000Methy/condition2/meQTLs53CpG/select53CpG.list /liuxx/MeQTL/whole_analyse_result/cisSigRlt > meqtl.cismatch.cpg53.snp
-awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/GAB1000Methy/condition2/meQTLs53CpG/select53CpG.list /liuxx/MeQTL/whole_analyse_result/transSigRlt > meqtl.transmatch.cpg53.snp
+head /geography/1000Methy/111SNPtoProvince/select111SNP.list
+cd /geography/1000Methy/condition2/meQTLs53CpG
+awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/1000Methy/condition2/meQTLs53CpG/select53CpG.list /liuxx/MeQTL/whole_analyse_result/cisSigRlt > meqtl.cismatch.cpg53.snp
+awk 'FNR==NR{a[$1]=$0;next}{ if(a[$1]) {print $0, a[$1]} }' /geography/1000Methy/condition2/meQTLs53CpG/select53CpG.list /liuxx/MeQTL/whole_analyse_result/transSigRlt > meqtl.transmatch.cpg53.snp
 ## after select Cpg 360
 awk '$4==cg15146515 {print $1, $2, $3, $4, $5}' /liuxx/MeQTL/whole_analyse_result/cisSigRlt > test1.cg15146515
 #no meqtl CPG in LXX#
@@ -1271,42 +1271,42 @@ Warning messages:
 2: package ‘MatrixEQTL’ is not available (for R version 3.3.1)
 ### map cpg53 for MatrixEQTL but package fail !!!
 plink --bfile //data/1000G/1000G --recode --out  
-## try plink cpg53~SNP(GAB　inteersct3qc ) 
-cd /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53
+## try plink cpg53~SNP(　inteersct3qc ) 
+cd /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53
 #keep 988 sample genofile
-plink --bfile /public_data/GABgenodata/Intersect_3qc_bim_SNP --keep /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/geo988list.usedmultilogis --make-bed --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988
+plink --bfile /public_data/genodata/Intersect_3qc_bim_SNP --keep /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/geo988list.usedmultilogis --make-bed --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988
 # try cpg ~ genome cpg cg15146515  by plink 
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988  --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, B, NK, CD4T CD8T, Mono, Neutro, Eosino, PC1, PC2, PC3, PC4, PC5 --linear hide-covar --ci 0.95 --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988  --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, B, NK, CD4T CD8T, Mono, Neutro, Eosino, PC1, PC2, PC3, PC4, PC5 --linear hide-covar --ci 0.95 --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp
 ##but all th p (snp) = NA  select < 0.05 get zero
-cd /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53
-awk '$12<0.05 {print $1, $2, $3, $4, $5, $6, $12}' /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.assoc.linear > cg15146515.meqtl.snp0.05
+cd /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53
+awk '$12<0.05 {print $1, $2, $3, $4, $5, $6, $12}' /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.assoc.linear > cg15146515.meqtl.snp0.05
 # try cov age cell 7 no pc1-5
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988  --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, B, NK, CD4T CD8T, Mono, Neutro, Eosino --linear hide-covar --ci 0.95 --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covcell7age
-awk '$12<0.05 {print $1, $2, $3, $4, $5, $6, $12}' /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covcell7age.assoc.linear > cg15146515.meqtl.snp.covcell7age.p0.05
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988  --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, B, NK, CD4T CD8T, Mono, Neutro, Eosino --linear hide-covar --ci 0.95 --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covcell7age
+awk '$12<0.05 {print $1, $2, $3, $4, $5, $6, $12}' /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covcell7age.assoc.linear > cg15146515.meqtl.snp.covcell7age.p0.05
 # still no snp p< 0.05
 # try cov just age 
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988  --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age --linear hide-covar --ci 0.95 --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covage
-awk '$12<0.05 {print $1, $2, $3, $4, $5, $6, $12}' /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covage.assoc.linear > cg15146515.meqtl.snp.covage.p0.05
-awk '$12 < 0.05/5983264 {print $1, $2, $3, $4, $5, $6, $12}' /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covage.assoc.linear > cg15146515.meqtl.snp.covage.pBonf0.05
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988  --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age --linear hide-covar --ci 0.95 --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covage
+awk '$12<0.05 {print $1, $2, $3, $4, $5, $6, $12}' /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covage.assoc.linear > cg15146515.meqtl.snp.covage.p0.05
+awk '$12 < 0.05/5983264 {print $1, $2, $3, $4, $5, $6, $12}' /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covage.assoc.linear > cg15146515.meqtl.snp.covage.pBonf0.05
 # 47713 meQTL SNPs selected
 # try cov age and pc1 +pc2
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988  --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, PC1, PC2 --linear hide-covar --ci 0.95 --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covagepc12
-awk '$12 < 0.05/5983264 {print $1, $2, $3, $4, $5, $6, $12}' /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covagepc12.assoc.linear > cg15146515.meqtl.snp.covagepc12.pBonf0.05
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988  --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, PC1, PC2 --linear hide-covar --ci 0.95 --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covagepc12
+awk '$12 < 0.05/5983264 {print $1, $2, $3, $4, $5, $6, $12}' /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg15146515.meqtl.snp.covagepc12.assoc.linear > cg15146515.meqtl.snp.covagepc12.pBonf0.05
 # select 24 same chr snps  with cov ageand pc12
 ### so next use age +pc12 for other cpg52
 ######cg03334052
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988 --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg03334052 --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, PC1, PC2 --linear hide-covar --ci 0.95 --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg03334052.meqtl.snp.covagepc12
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988 --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age,B,NK,CD4T,CD8T,Mono,Neutro,Eosino --linear hide-covar --ci 0.95 --out /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53covagecell7/cg15146515_meqtl.snp.covagecell7
-awk '$12 < 0.05/5983264 {print $1, $2, $3, $4, $5, $6, $12}' /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg03334052.meqtl.snp.covagepc12.assoc.linear > cg03334052.meqtl.snp.covagepc12.pBonf0.05
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988 --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg03334052 --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age, PC1, PC2 --linear hide-covar --ci 0.95 --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg03334052.meqtl.snp.covagepc12
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988 --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --pheno-name cg15146515 --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis --covar-name age,B,NK,CD4T,CD8T,Mono,Neutro,Eosino --linear hide-covar --ci 0.95 --out /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53covagecell7/cg15146515_meqtl.snp.covagecell7
+awk '$12 < 0.05/5983264 {print $1, $2, $3, $4, $5, $6, $12}' /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cg03334052.meqtl.snp.covagepc12.assoc.linear > cg03334052.meqtl.snp.covagepc12.pBonf0.05
 ##############################################################################
 ## try cpg53~age +cell7
-genofile <- " --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988"
-phenofile <- " --pheno /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis"
-covarfile <- " --covar /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis"
-outpath <- "//geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53covagecell7/"
+genofile <- " --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988"
+phenofile <- " --pheno /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis"
+covarfile <- " --covar /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/plink.phecon53data1-8.usedmultilogis"
+outpath <- "//geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53covagecell7/"
 outname <- "meqtl.covagecell7"
 setwd(outpath)
-phecondata <- read.csv("//geography/GAB1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
+phecondata <- read.csv("//geography/1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 covnames <- names(phecondata[c(3, 14:20)])
 covname <- paste0(" --covar-name ",paste0(covnames,collapse = ","))
@@ -1326,10 +1326,10 @@ resultname <- "ancestry.intersect3qc.conditional.gwas.y2.result"
 #############################################################
 ##20200601
 ##1.cpg_norm~age+3pc+3mePC+7cell ;2.cpg_norm_residuals~SNP
-cd /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull
-setwd("//geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull")
+cd /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull
+setwd("//geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull")
 load("/liuxx/MeQTL/newQC/residuals_norm_order_betadata_ready.RData")
-phecondata <- read.csv("//geography/GAB1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
+phecondata <- read.csv("//geography/1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 IID <- rownames(residuals_norm_order_betadata_ready)
 selectCPG <- residuals_norm_order_betadata_ready[,which(colnames(residuals_norm_order_betadata_ready) %in% cpgnames)]
@@ -1342,7 +1342,7 @@ FID <- residata$Me.id
 IID <- residata$Me.id
 residata2 <- cbind(FID, residata)
 write.table(residata2, file = "select53CPG.residata", quote = FALSE, row.names= FALSE)
-#  nohup /Bin/R-3.6.1 < /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/residcpg53.meqtl.covnull.R --no-save > /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/residcpg53.meqtl.covnull.R.log &
+#  nohup /Bin/R-3.6.1 < /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/residcpg53.meqtl.covnull.R --no-save > /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/residcpg53.meqtl.covnull.R.log &
 #　[1] 59590
 #################################################################
 ##20200602 meqtl CpG not in cpg53 %in% wrong
@@ -1351,11 +1351,11 @@ write.table(residata2, file = "select53CPG.residata", quote = FALSE, row.names= 
 #> sum(cpgnames %in% cpgnames1)
 #[1] 53
 # select 20 snp meqtl ~ residata cpg53
-cd /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull
-plink --bfile /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.GABgeo988 --extract /geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/snp20list.resid53cpg.meqtl --recodeA --out select20SNP.resid53cpg.meqtl
+cd /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull
+plink --bfile /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/genofile.geo988 --extract /geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/snp20list.resid53cpg.meqtl --recodeA --out select20SNP.resid53cpg.meqtl
 
-geno <- read.table("//geography/GAB1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/select20SNP.resid53cpg.meqtl.raw", header = TRUE)
-phecondata <- read.csv("//geography/GAB1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
+geno <- read.table("//geography/1000Methy/condition2/meQTLs53CpG/plinkCpG53/cpg53residcovnull/select20SNP.resid53cpg.meqtl.raw", header = TRUE)
+phecondata <- read.csv("//geography/1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
 geno <- geno[, -c(1,3,4,5,6)]
 IID <- phecondata$Me.id
 phecondata$IID <- IID
@@ -1377,8 +1377,8 @@ write.table(usedLogit, file = "province8.sample988.pheconmeQTLSNPdata.cpg53snp20
 
 ## predict 8 province by meqtl 20SNP
 /Bin/R-3.6.1
-setwd("//geography/GAB1000Methy/condition2/meQTLs53CpG/residcpg53.meqtlsnp20")
-data <- read.table("//geography/GAB1000Methy/condition2/meQTLs53CpG/residcpg53.meqtlsnp20/province8.sample988.pheconmeQTLSNPdata.cpg53snp20", header  =TRUE)
+setwd("//geography/1000Methy/condition2/meQTLs53CpG/residcpg53.meqtlsnp20")
+data <- read.table("//geography/1000Methy/condition2/meQTLs53CpG/residcpg53.meqtlsnp20/province8.sample988.pheconmeQTLSNPdata.cpg53snp20", header  =TRUE)
 meqtlSNP <- names(data[79:ncol(data)])
 library(nnet)
 
@@ -1399,9 +1399,9 @@ for (k in 1:8){
 auc
 ###plot accumulate AUC plot for 8 province
 ## AUC plot::::::::::::::::::::::::::::::::::::::::::::::::: 
-cd /geography/GAB1000Methy/condition2/multilogis8pro
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
-AUC <- read.table("//geography/GAB1000Methy/condition2/multilogis8pro/AUC.leave1out.province8.cpg53age", header = T)
+cd /geography/1000Methy/condition2/multilogis8pro
+setwd("//geography/1000Methy/condition2/multilogis8pro")
+AUC <- read.table("//geography/1000Methy/condition2/multilogis8pro/AUC.leave1out.province8.cpg53age", header = T)
 numcpg <- nrow(AUC)
 numy <- ncol(AUC)
 number <- 1:numcpg
@@ -1411,7 +1411,7 @@ mydata<-usedplot
 color<-rainbow(numy)
 rep <- rep(" ", times = numcpg)
 #legend 
-leg<-c("XinJiang", "NeiMeng",  "ShanXi", "HeNan", "ShanDong", "JiangXi", "SiChuan", "GuangXi")
+leg<-c("", "",  "ShanXi", "HeNan", "ShanDong", "JiangXi", "SiChuan", "GuangXi")
 # point shape
 pch_vec <- rep(c(15:18), 2)
 tiff("AUC increases as Number of CPGs increases.tiff",bg="white",height = 2400,width = 3000,res = 300)
@@ -1428,7 +1428,7 @@ dev.off()
 ##20200619 try to anno 53 cpg
 gm132-2
 R
-setwd("//geography/GAB1000Methy/condition2/select53CpGtoAnno")
+setwd("//geography/1000Methy/condition2/select53CpGtoAnno")
 source("http://bioconductor.org/biocLite.R")
 biocLite("TxDb.Hsapiens.UCSC.hg19.knownGene")
  .libPaths(c(.libPaths(), '/public_software/R/3.6.1'))
@@ -1438,22 +1438,22 @@ install.packages("TxDb.Hsapiens.UCSC.hg19.knownGene")
 #####################################################################
 ##20200620 meeeting Han(cpg vs snp)
 
-setwd("//geography/GAB1000Methy/HanCondition")
- phedata <- read.csv("//geography/GAB1000Methy/condition2/usedCon2.GABmale985Methy.csv",header = TRUE)
+setwd("//geography/1000Methy/HanCondition")
+ phedata <- read.csv("//geography/1000Methy/condition2/usedCon2.male985Methy.csv",header = TRUE)
 han <- phedata[which(phedata$population==1),]
-write.csv(han, file = "usedCon2.GABhan495Methy.csv", quote = FALSE, row.names = FALSE)
+write.csv(han, file = "usedCon2.han495Methy.csv", quote = FALSE, row.names = FALSE)
 #  3   4   5   6   7
 # 150  97  50  96  98
 ## 20200621 select shanxi 6CpG
 ## next HeNan shandong jiangxi sichuan
 ####################################################################
 ##20200623 predict 8 province 
-setwd("//geography/GAB1000Methy/HanCondition/hanConEWAS/HanMultilogis")
-phedata3 <- read.csv("//geography/GAB1000Methy/HanCondition/hanConEWAS/y3ShanXi/province.GABmaleHan.conditional.ewas1e-6.y3_6.phecondata_6", header = TRUE)
-phedata4 <- read.csv("//geography/GAB1000Methy/HanCondition/hanConEWAS/y4HeNan/province.GABmaleHan.conditional.ewas1e-6.y4_5.phecondata_5", header = TRUE)
-phedata5 <- read.csv("//geography/GAB1000Methy/HanCondition/hanConEWAS/y5ShanDong/province.GABmaleHan.conditional.ewas1e-6.y5_2.phecondata_2", header = TRUE)
-phedata6 <- read.csv("//geography/GAB1000Methy/HanCondition/hanConEWAS/y6JiangXi/province.GABmaleHan.conditional.ewas1e-6.y6_3.phecondata_3", header = TRUE)
-phedata7 <- read.csv("//geography/GAB1000Methy/HanCondition/hanConEWAS/y7SiChuan/province.GABmaleHan.conditional.ewas1e-6.y7_4.phecondata_4", header = TRUE)
+setwd("//geography/1000Methy/HanCondition/hanConEWAS/HanMultilogis")
+phedata3 <- read.csv("//geography/1000Methy/HanCondition/hanConEWAS/y3ShanXi/province.maleHan.conditional.ewas1e-6.y3_6.phecondata_6", header = TRUE)
+phedata4 <- read.csv("//geography/1000Methy/HanCondition/hanConEWAS/y4HeNan/province.maleHan.conditional.ewas1e-6.y4_5.phecondata_5", header = TRUE)
+phedata5 <- read.csv("//geography/1000Methy/HanCondition/hanConEWAS/y5ShanDong/province.maleHan.conditional.ewas1e-6.y5_2.phecondata_2", header = TRUE)
+phedata6 <- read.csv("//geography/1000Methy/HanCondition/hanConEWAS/y6JiangXi/province.maleHan.conditional.ewas1e-6.y6_3.phecondata_3", header = TRUE)
+phedata7 <- read.csv("//geography/1000Methy/HanCondition/hanConEWAS/y7SiChuan/province.maleHan.conditional.ewas1e-6.y7_4.phecondata_4", header = TRUE)
 data34 <- merge(phedata3[,-c(2:25)], phedata4[,-c(2:25)], by = "Me.id")
 data56 <- merge(phedata5[,-c(2:25)], phedata6[,-c(2:25)], by = "Me.id")
 data3456 <- merge(data34, data56, by = "Me.id")
@@ -1461,7 +1461,7 @@ data34567 <- merge(phedata7, data3456, by = "Me.id")
 write.csv(data34567, file = "Han.phecondata.csv", quote = FALSE, row.names = FALSE)
 write.csv(na.omit(data34567), file = "Han483.phecondata.csv", quote = FALSE, row.names = FALSE)
 
-setwd("//geography/GAB1000Methy/HanCondition/hanConEWAS/HanMultilogis")
+setwd("//geography/1000Methy/HanCondition/hanConEWAS/HanMultilogis")
 phecondata <- read.csv("Han.phecondata.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 covnames <- names(phecondata[c(3, 14:20)])
@@ -1483,22 +1483,22 @@ for (k in 1:5){
           } 
 auc
 #####################################################################################
-## 20200622 GABmale Han conditional GWAS
-plink --bfile /public_data/GABgenodata/Intersect_3qc_bim_SNP --keep /geography/GAB1000Methy/HanCondition/hanConGWAS/list.QCusedCon2.GABmale483 --make-bed --out /geography/GAB1000Methy/HanCondition/hanConGWAS/genofile.GABmaleHan483
+## 20200622 male Han conditional GWAS
+plink --bfile /public_data/genodata/Intersect_3qc_bim_SNP --keep /geography/1000Methy/HanCondition/hanConGWAS/list.QCusedCon2.male483 --make-bed --out /geography/1000Methy/HanCondition/hanConGWAS/genofile.maleHan483
 ## phenofile y 0/1 -> 1/2/
-setwd("//geography/GAB1000Methy/HanCondition/hanConGWAS")
-data483 <- read.csv("//geography/GAB1000Methy/HanCondition/hanConGWAS/province5.han.sample483.csv", header = TRUE)
+setwd("//geography/1000Methy/HanCondition/hanConGWAS")
+data483 <- read.csv("//geography/1000Methy/HanCondition/hanConGWAS/province5.han.sample483.csv", header = TRUE)
 write.table(data483, file = "province5.han.sample483", quote = F, row.names = F)
 ## after SNP select 
 ## construct multilogistic model
 # recode 25 SNP to 0/1/2 -- unique
 ## R
-cd /geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis
-plink --bfile /geography/GAB1000Methy/HanCondition/hanConGWAS/genofile.GABmaleHan483 --extract /geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis/select25SNP.list --recodeA --out select25SNP.GABmaleHan483
+cd /geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis
+plink --bfile /geography/1000Methy/HanCondition/hanConGWAS/genofile.maleHan483 --extract /geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis/select25SNP.list --recodeA --out select25SNP.maleHan483
 
-setwd("/thinker/storage/org/ Group//geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis")
-geno <- read.table("select25SNP.GABmaleHan483.raw", header = TRUE)
-province <- read.table("//geography/GAB1000Methy/HanCondition/hanConGWAS/province5.han.sample483", header = TRUE)
+setwd("/thinker/storage/org/ Group//geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis")
+geno <- read.table("select25SNP.maleHan483.raw", header = TRUE)
+province <- read.table("//geography/1000Methy/HanCondition/hanConGWAS/province5.han.sample483", header = TRUE)
 geno <- geno[, -c(1,3,4,5,6)]
 province <- province[, -1]
 usedLogit <- merge(province, geno, by = "IID")
@@ -1529,7 +1529,7 @@ names(usedLogit)[14:ncol(usedLogit)] <- usedLogitSNP
 save(usedLogit, file = "provinceHan.sample483.usedLogit.RData")
 write.table(usedLogit, file = "provinceHan.sample483.usedLogit", quote = FALSE, row.names = FALSE)
 ## run multilogistic predict
-setwd("//geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis")
+setwd("//geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis")
 library(dplyr)
 library(caret)
 library("nnet")
@@ -1555,27 +1555,27 @@ auc
 #################################################################
 #20200701:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #add Han CpG (vs SNP leave1out result) 
-setwd("//geography/GAB1000Methy/HanCondition/hanConEWAS/HanMultilogis")
+setwd("//geography/1000Methy/HanCondition/hanConEWAS/HanMultilogis")
 library(caret)
-phecondata <- read.csv("//geography/GAB1000Methy/HanCondition/hanConEWAS/HanMultilogis/Han483.phecondata.csv", header  =TRUE)
+phecondata <- read.csv("//geography/1000Methy/HanCondition/hanConEWAS/HanMultilogis/Han483.phecondata.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 # cov age
 covnames <- names(phecondata[3]) 
 fitdata <- na.omit(phecondata)
 yname <- as.character(paste("y", c(3:7), sep = ""))
-pre <- read.table("//geography/GAB1000Methy/HanCondition/hanConEWAS/HanMultilogis/accumulateCpGtoProvince5Han.pre", header = TRUE)
+pre <- read.table("//geography/1000Methy/HanCondition/hanConEWAS/HanMultilogis/accumulateCpGtoProvince5Han.pre", header = TRUE)
 # !!prevince3-7 predict to 1-5  so pre$x+2
 per_logis1 <-  confusionMatrix(factor(pre$x+2),factor(fitdata$province))
 per_logis1
 
 #add Han CpG (vs SNP leave1out result) 
-setwd("//geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis")
+setwd("//geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis")
 library(caret)
-usedLogit <- read.csv("//geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis/provinceHan.sample483.usedLogit.csv", header = TRUE)
+usedLogit <- read.csv("//geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis/provinceHan.sample483.usedLogit.csv", header = TRUE)
 fitdata <- na.omit(usedLogit[,-c(1:4)]) #475*34
 snpname <- colnames(fitdata)[10:ncol(fitdata)]
 yname <- as.character(paste("y", c(3:7), sep = ""))
-pre <- read.table("//geography/GAB1000Methy/HanCondition/hanConGWAS/HanMultilogis/accumulateSNPtoProvince5Han.pre", header = TRUE)
+pre <- read.table("//geography/1000Methy/HanCondition/hanConGWAS/HanMultilogis/accumulateSNPtoProvince5Han.pre", header = TRUE)
 # !!prevince3-7 predict to 1-5  so pre$x+2
 per_logis1 <-  confusionMatrix(factor(pre$x+2),factor(fitdata$province))
 per_logis1
@@ -1604,15 +1604,15 @@ for (k in 1:7){
 auc
 #20200702:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 library(caret)
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro/geo7pre")
-pre <- read.table("//geography/GAB1000Methy/condition2/multilogis8pro/geo7pre/geoarea7.cpg53age.pre", header = TRUE)
+setwd("//geography/1000Methy/condition2/multilogis8pro/geo7pre")
+pre <- read.table("//geography/1000Methy/condition2/multilogis8pro/geo7pre/geoarea7.cpg53age.pre", header = TRUE)
 fitdata <- na.omit(phecondata)
 per_logis1 <-  confusionMatrix(factor(pre$x),factor(fitdata$geo7))
 per_logis1
 ######################################################################
 ##20200702 infer_G software::::::::::::::::::::::::::::::::::::::::::
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro/inferG_software")
-phecondata <- read.csv("//geography/GAB1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
+setwd("//geography/1000Methy/condition2/multilogis8pro/inferG_software")
+phecondata <- read.csv("//geography/1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
 cpgnames <- names(phecondata[26:ncol(phecondata)])
 covnames <- names(phecondata[3]) 
 fitdata <- na.omit(phecondata)#965*78
@@ -1626,8 +1626,8 @@ write.csv(inferG, file = "inferG.csv", quote = FALSE, row.names= FALSE)
 y ~cpg53 [no cov]
 
 ## ########################################
-##20200703 share GAB Methylation data 998 after QC to JiangLi and XuJiChen　
-setwd("//geography/GAB1000Methy/toGABMethyData")
+##20200703 share  Methylation data 998 after QC to JiangLi and XuJiChen　
+setwd("//geography/1000Methy/toMethyData")
 load("/liuxx/DNAm_data/betadata.RData")
 ls()
 #[1] "betadata"
@@ -1642,9 +1642,9 @@ save(betadata2, file = "betadata2.RData")
 ####################################################################
 ##20200714 add AUC for cov Null (-age -cell)
 library(caret)
-setwd("//geography/GAB1000Methy/condition2/multilogis8pro")
-phecondata <- read.csv("//geography/GAB1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
-pre <- read.table("//geography/GAB1000Methy/condition2/multilogis8pro/province8.cpg53covNull.pre", header = TRUE)
+setwd("//geography/1000Methy/condition2/multilogis8pro")
+phecondata <- read.csv("//geography/1000Methy/condition2/multilogis8pro/phecon53data1-8.csv", header  =TRUE)
+pre <- read.table("//geography/1000Methy/condition2/multilogis8pro/province8.cpg53covNull.pre", header = TRUE)
 fitdata <- na.omit(phecondata)
 per_logis1 <-  confusionMatrix(factor(pre$x),factor(fitdata$province))
 per_logis1
